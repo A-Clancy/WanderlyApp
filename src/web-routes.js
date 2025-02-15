@@ -1,7 +1,7 @@
 import { aboutController } from "./controllers/about-controller.js";
 import { accountsController } from "./controllers/accounts-controller.js";
 import { dashboardController } from "./controllers/dashboard-controller.js";
-import { playlistController } from "./controllers/playlist-controller.js";
+import { categoryController } from "./controllers/category-controller.js";
 
 export const webRoutes = [
   { method: "GET", path: "/", config: accountsController.index },
@@ -13,12 +13,11 @@ export const webRoutes = [
 
   { method: "GET", path: "/about", config: aboutController.index },
 
-  { method: "GET", path: "/dashboard", config: dashboardController.index },
-  { method: "POST", path: "/dashboard/addplaylist", config: dashboardController.addPlaylist },
-  { method: "GET", path: "/dashboard/deleteplaylist/{id}", config: dashboardController.deletePlaylist },
+  { method: "GET", path: "/dashboard", config: { handler: dashboardController.index, auth: "session" } },
+  { method: "POST", path: "/dashboard/addcategory", config: { handler: dashboardController.addCategory, auth: "session" } },
+  { method: "GET", path: "/dashboard/deletecategory/{id}", config: { handler: dashboardController.deleteCategory, auth: "session" } },
 
-  { method: "GET", path: "/playlist/{id}", config: playlistController.index },
-  { method: "POST", path: "/playlist/{id}/addtrack", config: playlistController.addTrack },
-  { method: "GET", path: "/playlist/{id}/deletetrack/{trackid}", config: playlistController.deleteTrack },
-
+  { method: "GET", path: "/category/{id}", config: { handler: categoryController.index, auth: "session" } },
+  { method: "POST", path: "/category/{id}/addpoi", config: { handler: categoryController.addPOI, auth: "session" } },
+  { method: "GET", path: "/category/{id}/deletepoi/{poiid}", config: { handler: categoryController.deletePOI, auth: "session" } },
 ];

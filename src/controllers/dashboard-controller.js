@@ -1,36 +1,37 @@
-import { db } from "../models/db.js";
+import { categoryMemStore } from "../models/mem/category-mem-store.js";
 
 export const dashboardController = {
-  index: {
-    handler: async function (request, h) {
-      const loggedInUser = request.auth.credentials;
-      const playlists = await db.playlistStore.getUserPlaylists(loggedInUser._id);
-      const viewData = {
-        title: "Playtime Dashboard",
-        user: loggedInUser,
-        playlists: playlists,
-      };
-      return h.view("dashboard-view", viewData);
-    },
+  async index(request, h) {
+    const user = request.auth.credentials;
+    if (!user) {
+      return h.redirect("/login");
+    }
+    const userId = user.id;
+    const categories = await categoryMemStore.getCategoriesByUserId(userId);
+    const viewData = {
+      title: "User Categories",
+      categories: categories,
+    };
+    return h.view("dashboard-view", viewData);
   },
+  
 
-  addPlaylist: {
-    handler: async function (request, h) {
-      const loggedInUser = request.auth.credentials;
-      const newPlayList = {
-        userid: loggedInUser._id,
-        title: request.payload.title,
-      };
-      await db.playlistStore.addPlaylist(newPlayList);
-      return h.redirect("/dashboard");
-    },
+  async addCategory(request, h) {
+    const user = request.auth.credentials;
+    if (!user) {
+      return h.redirect("/login");
+    }
+    const userId = user.id;
+    const newCategory = {
+      name: request.payload.name,
+    };
+    await categoryMemStore.addCategory(userId, newCategory);
+    return h.redirect("/dashboard");
   },
+  
 
-  deletePlaylist: {
-    handler: async function (request, h) {
-      const playlist = await db.playlistStore.getPlaylistById(request.params.id);
-      await db.playlistStore.deletePlaylistById(playlist._id);
-      return h.redirect("/dashboard");
-    },
+  async deleteCategory(request, h) {
+    await categoryMemStore.deleteCategory(request.params.id);
+    return h.redirect("/dashboard");
   },
 };
