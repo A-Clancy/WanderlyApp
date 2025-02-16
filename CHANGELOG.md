@@ -1,5 +1,8 @@
 # Playtime Changelog
 
+## Wanderly Version 1
+- refactoring to remove playlist references. 
+
 ## version 0.3.0
 
 - support delete playlist + tracks

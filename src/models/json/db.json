@@ -1,0 +1,13 @@
+{
+  "users": [
+    {
+      "firstName": "Aidan",
+      "lastName": "Clancy",
+      "email": "a@a.com",
+      "password": "a",
+      "_id": "7a782fbb-652c-4235-8337-bd8a69373482"
+    }
+  ],
+  "categories": [],
+  "pois": []
+}
