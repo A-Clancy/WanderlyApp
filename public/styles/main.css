@@ -1,0 +1,32 @@
+:root {
+    --bulma-primary: #6CA9FE;  /* Sky Blue */
+    --bulma-info: #A0C8FE;  /* Light Blue */
+    --bulma-warning: #4B2410;  /* Dark Brown */
+    --bulma-background: #F9FBFE;  /* Off White */
+    --bulma-light: #DEECFE;  /* Very Light Blue */
+  }
+  
+  html {
+    --bulma-primary-h: 211;
+    --bulma-primary-s: 95%;
+    --bulma-primary-l: 65%;
+  }
+  
+  .navbar {
+    background-color: var(--bulma-primary);
+  }
+  
+  body {
+    background-color: var(--bulma-background);
+  }
+  
+  .button.is-primary {
+    background-color: var(--bulma-primary);
+    border-color: var(--bulma-primary);
+  }
+  
+  .box {
+    border: 1px solid var(--bulma-light);
+    background-color: var(--bulma-light);
+  }
+  
