@@ -45,7 +45,7 @@ This project was inspired by an idea originally developed during a **Techstars S
      PORT=3000
      SESSION_SECRET=your_random_secret_here
      COOKIE_PASSWORD=your_secure_random_password
-     # MONGO_URL=mongodb+srv://your-username:your-password@your-cluster.mongodb.net/wanderly?retryWrites=true&w=majority
+     # MONGO_
      ```
 4. **Start the application**:
    ```sh
