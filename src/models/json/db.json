@@ -6,6 +6,13 @@
       "email": "a@a.com",
       "password": "a",
       "_id": "7a782fbb-652c-4235-8337-bd8a69373482"
+    },
+    {
+      "firstName": "a",
+      "lastName": "c",
+      "email": "a@a.com",
+      "password": "a",
+      "_id": "5ec392de-eb18-41a4-b404-d3d402fea8b7"
     }
   ],
   "categories": [],

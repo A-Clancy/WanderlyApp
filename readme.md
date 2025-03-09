@@ -51,6 +51,10 @@ This project was inspired by an idea originally developed during a **Techstars S
    ```sh
    npm start
    ```
+to start in Dev mode
+   ```sh
+   npm run dev 
+   ```
 
 ## Technology Stack
 
