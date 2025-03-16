@@ -1,10 +1,11 @@
+import Inert from "@hapi/inert";
 import Vision from "@hapi/vision";
 import Hapi from "@hapi/hapi";
-import Inert from "@hapi/inert";  // to show static logos etc
 import Cookie from "@hapi/cookie";
 import dotenv from "dotenv";
 import path from "path";
 import Joi from "joi";
+import HapiSwagger from "hapi-swagger";
 import { fileURLToPath } from "url";
 import Handlebars from "handlebars";
 import { webRoutes } from "./web-routes.js";
@@ -21,12 +22,29 @@ if (result.error) {
   process.exit(1);
 }
 
+const swaggerOptions = {
+  info: {
+    title: "Wanderly API",
+    version: "1.0",
+  },
+};
+
 async function init() {
   const server = Hapi.server({
     port: process.env.PORT || 3000,
   });
 
-  await server.register([Vision, Inert, Cookie]);
+  await server.register(Cookie);
+
+  await server.register([
+    Inert,
+    Vision,
+    {
+      plugin: HapiSwagger,
+      options: swaggerOptions,
+    },
+  ]);
+
   server.validator(Joi);
 
   server.views({
@@ -50,28 +68,18 @@ async function init() {
     redirectTo: "/",
     validate: accountsController.validate,
   });
+
   server.auth.default("session");
 
-  db.init();
-
-  server.route({
-    method: "GET",
-    path: "/{param*}",
-    handler: {
-      directory: {
-        path: "public",
-        listing: false,
-        index: false,
-      },
-    },
-  });
-
+  await db.init("mongo");
+  
   server.route(webRoutes);
-  server.route([...apiRoutes]);
-
+  server.route(apiRoutes);
+  
   await server.start();
   console.log("Server running on %s", server.info.uri);
 }
+
 
 process.on("unhandledRejection", (err) => {
   console.log(err);
@@ -79,3 +87,12 @@ process.on("unhandledRejection", (err) => {
 });
 
 init();
+
+export async function createServer() {
+  const server = Hapi.server({ port: 3000 });
+
+  await db.init();  
+  server.route(apiRoutes);
+
+  return server;
+}
