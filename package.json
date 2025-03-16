@@ -4,20 +4,21 @@
   "description": "A POI based application for the HDip in Computing, WIT",
   "main": "src/server.js",
   "type": "module",
-"scripts": {
-  "start": "node src/server.js",
-  "dev": "nodemon src/server.js --ignore 'src/models/json/*.json'",
-  "lint": "./node_modules/.bin/eslint . --ext .js",
-  "test": "mocha --ui tdd test/**/*.js --exit",
-  "testmodels": "mocha --ui tdd test/models/**/*.js --exit",
-  "testapi": "mocha --ui tdd test/api/**/*.js --exit"
-},
-
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js --ignore 'src/models/json/*.json'",
+    "lint": "./node_modules/.bin/eslint . --ext .js",
+    "test": "mocha --ui tdd test/**/*.js --exit",
+    "testmodels": "mocha --ui tdd test/models/**/*.js --exit",
+    "testapi": "mocha --ui tdd test/api/**/*.js --exit"
+  },
   "dependencies": {
+    "@hapi/boom": "^10.0.1",
     "@hapi/cookie": "^12.0.1",
     "@hapi/hapi": "^21.3.12",
     "@hapi/inert": "^7.1.0",
     "@hapi/vision": "^7.0.3",
+    "axios": "^1.8.3",
     "bulma": "^1.0.3",
     "dotenv": "^16.4.7",
     "handlebars": "^4.7.8",

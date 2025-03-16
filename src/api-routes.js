@@ -9,9 +9,10 @@ export const apiRoutes = [
   { method: "GET", path: "/api/users/{id}", config: userApi.findOne },
 
   { method: "GET", path: "/api/categories", config: categoryApi.find },
+  { method: "GET", path: "/api/categories/{id}", config: categoryApi.findOne },
   { method: "POST", path: "/api/categories", config: categoryApi.create },
-  { method: "DELETE", path: "/api/categories", config: categoryApi.deleteAll },
   { method: "DELETE", path: "/api/categories/{id}", config: categoryApi.deleteOne },
+  { method: "DELETE", path: "/api/categories", config: categoryApi.deleteAll },
 
   { method: "GET", path: "/api/pois", config: poiApi.find },
   { method: "POST", path: "/api/pois", config: poiApi.create },
