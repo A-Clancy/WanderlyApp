@@ -4,11 +4,15 @@
   "description": "A POI based application for the HDip in Computing, WIT",
   "main": "src/server.js",
   "type": "module",
-  "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
-    "lint": "./node_modules/.bin/eslint . --ext .js"
-  },
+"scripts": {
+  "start": "node src/server.js",
+  "dev": "nodemon src/server.js --ignore 'src/models/json/*.json'",
+  "lint": "./node_modules/.bin/eslint . --ext .js",
+  "test": "mocha --ui tdd test/**/*.js --exit",
+  "testmodels": "mocha --ui tdd test/models/**/*.js --exit",
+  "testapi": "mocha --ui tdd test/api/**/*.js --exit"
+},
+
   "dependencies": {
     "@hapi/cookie": "^12.0.1",
     "@hapi/hapi": "^21.3.12",
@@ -23,10 +27,12 @@
     "uuid": "^11.0.5"
   },
   "devDependencies": {
+    "chai": "^5.2.0",
     "eslint": "^8.57.1",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-import": "^2.31.0",
+    "mocha": "^11.1.0",
     "nodemon": "^3.1.9",
     "prettier": "^3.4.2"
   }
