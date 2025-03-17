@@ -4,6 +4,11 @@ import { serviceUrl } from "../fixtures.js";
 export const wanderlyService = {
   wanderlyUrl: serviceUrl,
 
+  async authenticateUser(user) {
+    const response = await axios.post("http://localhost:3000/api/users/authenticate", user);
+    return response.data;
+  },
+
   async getAllCategories() {
     const res = await axios.get(`${this.wanderlyUrl}/api/categories`);
     return res.data;

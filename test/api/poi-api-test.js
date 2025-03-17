@@ -28,7 +28,7 @@ suite("POI API Tests", () => {
   });
 
   suiteTeardown(async () => {
-    await db.clear();
+    await db.deleteAllPOIs();
   });
 
   test("Create POI", async () => {
