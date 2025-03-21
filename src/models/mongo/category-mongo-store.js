@@ -32,5 +32,10 @@ export const categoryMongoStore = {
 
   async deleteAllCategories() {
     await Category.deleteMany({});
+  },
+
+  async getCategoriesByUserId(userId) {
+    return Category.find({ userId }).lean();
   }
+
 };

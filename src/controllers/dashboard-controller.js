@@ -6,7 +6,7 @@ export const dashboardController = {
     if (!user) {
       return h.redirect("/login");
     }
-    const userId = user._id;  // Mongo uses _id not id
+    const userId = user._id;
     const categories = await db.categoryStore.getCategoriesByUserId(userId);
     const viewData = {
       title: "User Categories",
@@ -20,13 +20,26 @@ export const dashboardController = {
     if (!user) {
       return h.redirect("/login");
     }
+
     const userId = user._id;
     const newCategory = {
       name: request.payload.name,
-      userid: userId, // Important for querying by user
+      userId: userId,
     };
-    await db.categoryStore.addCategory(userId, newCategory);
-    return h.redirect("/dashboard");
+
+    console.log("ADD CATEGORY ATTEMPT:", newCategory);
+
+    try {
+      await db.categoryStore.addCategory(newCategory); // ⬅ only pass one argument
+      return h.redirect("/dashboard");
+    } catch (error) {
+      console.error("ADD CATEGORY ERROR:", error.message);
+      return h.view("dashboard-view", {
+        title: "Dashboard Error",
+        categories: [],
+        error: "Unable to add category.",
+      }).code(500);
+    }
   },
 
   async deleteCategory(request, h) {

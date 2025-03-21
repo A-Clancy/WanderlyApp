@@ -31,9 +31,24 @@ export const accountsController = {
     },
     handler: async function (request, h) {
       const user = request.payload;
-      await db.userStore.addUser(user);
-      return h.redirect("/");
-    },
+      console.log("SIGNUP ATTEMPT:", user);
+    
+      try {
+        const newUser = await db.userStore.addUser(user);
+        request.cookieAuth.set({ id: newUser._id });
+        return h.redirect("/dashboard");
+      } catch (error) {
+        let message = "Unable to register user. Please try again.";
+        if (error.code === 11000) {
+          message = "This email is already registered.";
+        }
+        console.error("SIGNUP ERROR:", error.message);
+        return h.view("signup-view", {
+          title: "Signup Error",
+          errors: [{ message }],
+        }).code(400);
+      }
+    }      
   },
   showLogin: {
     auth: false,

@@ -12,6 +12,10 @@ export const poiMongoStore = {
     return null;
   },
 
+  async getPOIsByCategoryId(categoryId) {
+    return POI.find({ categoryid: categoryId }).lean();
+  },
+
   async addPOI(poi) {
     const newPOI = new POI(poi);
     const poiObj = await newPOI.save();

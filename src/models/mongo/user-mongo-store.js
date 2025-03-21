@@ -14,10 +14,18 @@ export const userMongoStore = {
   },
 
   async addUser(user) {
-    const newUser = new User(user);
-    await newUser.save();
-    return newUser;
+    try {
+      console.log("ADD USER PAYLOAD:", user);
+      const newUser = new User(user);
+      await newUser.save();
+      console.log("USER CREATED:", newUser);
+      return newUser;
+    } catch (error) {
+      console.error("MONGO ADD USER ERROR:", error.message);
+      throw error;
+    }
   },
+  
 
   async deleteUser(id) {
     await User.findByIdAndDelete(id);
