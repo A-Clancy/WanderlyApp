@@ -1,4 +1,4 @@
-import { categoryMemStore } from "../models/mem/category-mem-store.js";
+import { db } from "../models/db.js";
 
 export const dashboardController = {
   async index(request, h) {
@@ -6,32 +6,31 @@ export const dashboardController = {
     if (!user) {
       return h.redirect("/login");
     }
-    const userId = user.id;
-    const categories = await categoryMemStore.getCategoriesByUserId(userId);
+    const userId = user._id;  // Mongo uses _id not id
+    const categories = await db.categoryStore.getCategoriesByUserId(userId);
     const viewData = {
       title: "User Categories",
       categories: categories,
     };
     return h.view("dashboard-view", viewData);
   },
-  
 
   async addCategory(request, h) {
     const user = request.auth.credentials;
     if (!user) {
       return h.redirect("/login");
     }
-    const userId = user.id;
+    const userId = user._id;
     const newCategory = {
       name: request.payload.name,
+      userid: userId, // Important for querying by user
     };
-    await categoryMemStore.addCategory(userId, newCategory);
+    await db.categoryStore.addCategory(userId, newCategory);
     return h.redirect("/dashboard");
   },
-  
 
   async deleteCategory(request, h) {
-    await categoryMemStore.deleteCategory(request.params.id);
+    await db.categoryStore.deleteCategoryById(request.params.id);
     return h.redirect("/dashboard");
   },
 };
