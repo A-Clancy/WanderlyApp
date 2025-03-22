@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { POI } from "./poi.js";
 
 export const poiMongoStore = {
@@ -13,10 +14,11 @@ export const poiMongoStore = {
   },
 
   async getPOIsByCategoryId(categoryId) {
-    return POI.find({ categoryid: categoryId }).lean();
+    return POI.find({ categoryId: new mongoose.Types.ObjectId(categoryId) }).lean();
   },
 
   async addPOI(poi) {
+    console.log("POI PAYLOAD RECEIVED:", poi);
     const newPOI = new POI(poi);
     const poiObj = await newPOI.save();
     return this.getPOIById(poiObj._id);

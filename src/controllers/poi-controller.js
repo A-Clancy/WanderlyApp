@@ -26,9 +26,10 @@ export const poiController = {
       description: request.payload.description,
       latitude: Number(request.payload.latitude),
       longitude: Number(request.payload.longitude),
-      categoryid: categoryId,
+      categoryId: categoryId,
     };
-    await db.poiStore.addPOI(categoryId, newPOI);
+  
+    await db.poiStore.addPOI(newPOI);
     return h.redirect(`/category/${categoryId}`);
   },
 

@@ -5,7 +5,7 @@ const poiSchema = new mongoose.Schema({
   description: String,
   latitude: Number,
   longitude: Number,
-  categoryid: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
+  categoryId: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
 });
 
 export const POI = mongoose.model("POI", poiSchema);

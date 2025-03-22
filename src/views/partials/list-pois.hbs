@@ -1,3 +1,4 @@
+<p class="has-text-grey">Found {{pois.length}} POIs</p>
 {{#if pois.length}}
   <table class="table is-fullwidth">
     <thead>
@@ -26,3 +27,7 @@
     </tbody>
   </table>
 {{else}}
+  <div class="notification is-light has-text-grey">
+    No POIs have been added to this category yet.
+  </div>
+{{/if}}
