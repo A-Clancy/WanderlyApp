@@ -76,6 +76,18 @@ npm run dev (development environment)
 - Add interactive maps for POIs
 - Enable image uploads
 
+## Git Branching
+
+To test additional features the following branches were created:
+
+| Branch                   | Purpose                                       |
+|--------------------------|-----------------------------------------------|
+| `main`                  | Working version                                |
+| `feature/mongo-atlas`   | Migration from local MongoDB to MongoDB Atlas  |
+| `feature/glitch-deploy` | Deployment adjustments for Glitch hosting      |
+
+Each feature branch is merged back into `main` once tested and tagged. 
+
 ## Contribution
 
 
