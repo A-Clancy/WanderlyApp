@@ -42,4 +42,10 @@ suite("Category Model Tests", () => {
     const deletedCategory = await Category.findById(createdCategory._id);
     assert.isNull(deletedCategory);
   });
+
+  teardown(async () => {
+    await User.deleteMany({});
+    await Category.deleteMany({});
+  });
+
 });

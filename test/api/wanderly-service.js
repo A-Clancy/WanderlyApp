@@ -1,8 +1,13 @@
 import axios from "axios";
 import { serviceUrl } from "../fixtures.js";
 
-export const wanderlyService = {
+export const wanderlyService = { 
   wanderlyUrl: serviceUrl,
+
+  async createUser(user) {
+    const response = await axios.post("http://localhost:3000/api/users", user);
+    return response.data;
+  },
 
   async authenticateUser(user) {
     const response = await axios.post("http://localhost:3000/api/users/authenticate", user);

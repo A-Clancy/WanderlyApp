@@ -27,7 +27,7 @@ if (result.error) {
 const swaggerOptions = {
   info: {
     title: "Wanderly API",
-    version: "1.0",
+    version: "2.0",
   },
 };
 
@@ -89,7 +89,18 @@ init();
 export async function createServer() {
   const server = Hapi.server({ port: 3000 });
 
-  await db.init();  
+  await db.init();
+
+  await server.register(jwt);
+
+  server.auth.strategy("jwt", "jwt", {
+    key: process.env.cookie_password,
+    validate,
+    verifyOptions: { algorithms: ["HS256"] },
+  });
+
+  server.auth.default("jwt");
+
   server.route(apiRoutes);
 
   return server;

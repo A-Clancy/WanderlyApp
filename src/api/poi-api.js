@@ -71,18 +71,22 @@ export const poiApi = {
       }),
     },
     handler: async (request, h) => {
-      console.log("Handling PUT /api/pois/{id}");
-      
       const poi = await db.poiStore.getPOIById(request.params.id);
       if (!poi) {
         return Boom.notFound("POI not found");
       }
-
-      await db.poiStore.updatePOI(request.params.id, request.payload);
-      console.log("Updated POI:", request.payload);
-      return h.response({ success: true }).code(200);
+  
+      if (request.payload.name) poi.name = request.payload.name;
+      if (request.payload.description) poi.description = request.payload.description;
+      if (request.payload.latitude) poi.latitude = request.payload.latitude;
+      if (request.payload.longitude) poi.longitude = request.payload.longitude;
+  
+      await poi.save(); 
+  
+      return h.response(poi).code(200); 
     },
-  }, 
+  },
+  
 
   deleteOne: {
     auth: "jwt",
