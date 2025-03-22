@@ -10,3 +10,25 @@
     </ul>
   </div>
 </section>
+
+<section class="section">
+  <h2 class="subtitle">Registered Users ({{userCount}})</h2>
+  <table class="table is-fullwidth is-striped">
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each users}}
+      <tr>
+        <td>{{email}}</td>
+        <td>
+          <a href="/admin/deleteuser/{{_id}}" class="button is-small is-danger">Delete</a>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</section>

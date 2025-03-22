@@ -22,4 +22,7 @@ export const webRoutes = [
   { method: "GET", path: "/category/{id}", config: { handler: poiController.index, auth: "session" } },
   { method: "POST", path: "/category/{id}/addpoi", config: { handler: poiController.addPOI, auth: "session" } },
   { method: "GET", path: "/category/{id}/deletepoi/{poiid}", config: { handler: poiController.deletePOI, auth: "session" } },
+
+  { method: "GET", path: "/admin/deleteuser/{id}", config: { handler: adminController.deleteUser, auth: "session" } },
+
 ];
