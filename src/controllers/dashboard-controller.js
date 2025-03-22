@@ -6,8 +6,18 @@ export const dashboardController = {
     if (!user) {
       return h.redirect("/login");
     }
+
     const userId = user._id;
     const categories = await db.categoryStore.getCategoriesByUserId(userId);
+
+    // Add POI counts
+    await Promise.all(
+      categories.map(async (category) => {
+        const pois = await db.poiStore.getPOIsByCategoryId(category._id);
+        category.poiCount = pois.length;
+      })
+    );
+
     const viewData = {
       title: "User Categories",
       categories: categories,
@@ -30,7 +40,7 @@ export const dashboardController = {
     console.log("ADD CATEGORY ATTEMPT:", newCategory);
 
     try {
-      await db.categoryStore.addCategory(newCategory); // ⬅ only pass one argument
+      await db.categoryStore.addCategory(newCategory);
       return h.redirect("/dashboard");
     } catch (error) {
       console.error("ADD CATEGORY ERROR:", error.message);
