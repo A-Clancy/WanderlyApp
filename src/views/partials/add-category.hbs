@@ -1,9 +1,11 @@
-<form action="/dashboard/addcategory" method="POST">
-  <div class="field">
-    <label class="label">Category Name</label>
-    <div class="control">
-      <input class="input" type="text" name="name" required>
+<form class="box" action="/dashboard/addcategory" method="POST">
+  <label class="label">Create a New Category</label>
+  <div class="field is-horizontal">
+    <div class="field-body">
+      <div class="field">
+        <input class="input" type="text" placeholder="e.g. Beaches, Forest Trails" name="name" required>
+      </div>
     </div>
   </div>
-  <button class="button is-primary" type="submit">Add Category</button>
+  <button class="button is-link is-light">Add Category</button>
 </form>

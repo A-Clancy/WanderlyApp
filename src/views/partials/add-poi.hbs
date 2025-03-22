@@ -1,12 +1,12 @@
 <form class="box" action="/category/{{category._id}}/addpoi" method="POST">
-  <label>Enter POI Details:</label>
+  <label class="label">Add a Point of Interest</label>
   <div class="field is-horizontal">
     <div class="field-body">
       <div class="field">
-        <input class="input" type="text" placeholder="Enter POI Name" name="name" required>
+        <input class="input" type="text" placeholder="POI Name" name="name" required>
       </div>
       <div class="field">
-        <input class="input" type="text" placeholder="Enter Description" name="description" required>
+        <input class="input" type="text" placeholder="Short Description" name="description" required>
       </div>
       <div class="field">
         <input class="input" type="number" step="0.000001" placeholder="Latitude" name="latitude" required>
@@ -16,5 +16,5 @@
       </div>
     </div>
   </div>
-  <button class="button is-primary">Add POI</button>
+  <button class="button is-primary is-light">Add POI</button>
 </form>
