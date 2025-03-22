@@ -77,6 +77,18 @@ async function init() {
 
   await server.start();
   console.log("Server running on %s", server.info.uri);
+
+  server.route({
+    method: "GET",
+    path: "/images/{param*}",
+    handler: {
+      directory: {
+        path: "./public/images",
+        listing: false,
+      },
+    },
+  });
+
 }
 
 process.on("unhandledRejection", (err) => {
