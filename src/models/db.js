@@ -25,23 +25,24 @@ export const db = {
         this.poiStore = poiJsonStore;
         break;
 
-      case "mongo":
-        try {
-          await mongoose.connect(process.env.MONGO_URL);
-          console.log("MongoDB Connected to:", process.env.MONGO_URL);
-
-          const { userMongoStore } = await import("./mongo/user-mongo-store.js");
-          const { categoryMongoStore } = await import("./mongo/category-mongo-store.js");
-          const { poiMongoStore } = await import("./mongo/poi-mongo-store.js");
-
-          this.userStore = userMongoStore;
-          this.categoryStore = categoryMongoStore;
-          this.poiStore = poiMongoStore;
-        } catch (error) {
-          console.error("MongoDB Connection Error:", error);
-          process.exit(1);
-        }
-        break;
+        case "mongo":
+          try {
+            const { connectMongo } = await import("./mongo/connect.js");
+            await connectMongo();
+        
+            const { userMongoStore } = await import("./mongo/user-mongo-store.js");
+            const { categoryMongoStore } = await import("./mongo/category-mongo-store.js");
+            const { poiMongoStore } = await import("./mongo/poi-mongo-store.js");
+        
+            this.userStore = userMongoStore;
+            this.categoryStore = categoryMongoStore;
+            this.poiStore = poiMongoStore;
+          } catch (error) {
+            console.error("MongoDB Connection Error:", error);
+            process.exit(1);
+          }
+          break;
+        
 
       default:
         this.userStore = userMemStore;
