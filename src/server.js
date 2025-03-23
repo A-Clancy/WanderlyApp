@@ -89,6 +89,17 @@ async function init() {
     },
   });
 
+  server.route({
+    method: "GET",
+    path: "/styles/{param*}",
+    handler: {
+      directory: {
+        path: "./public/styles",
+        listing: false,
+      },
+    },
+  });
+
 }
 
 process.on("unhandledRejection", (err) => {
@@ -117,3 +128,4 @@ export async function createServer() {
 
   return server;
 }
+
