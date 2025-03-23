@@ -19,7 +19,7 @@ At the time, our team lacked the expertise to create a working model. The idea h
 - **MongoDB Integration**: All data is now stored persistently using MongoDB.
 - **Swagger Documentation**: Live API documentation available at `/documentation`.
 - **Admin Dashboard**: View system-wide analytics like user, category, and POI counts.
-- **Testing**: Includes model and API-level tests using Mocha and Chai.
+- **Testing**: Includes model and API-level tests using Mocha and Chai. **Note: Some tests failed during the setup, specifically around category creation and database seeding.**
 - **Dev Mode Support**: Nodemon can be used for development.
 
 ## Admin Access
@@ -64,7 +64,7 @@ npm run dev (development environment)
 
  - Frontend: Handlebars, Bulma
 
-- Database: MongoDB
+- Database: MongoDB, CloudAtlas
 
 - Authentication: Cookie-based sessions
 
@@ -72,7 +72,6 @@ npm run dev (development environment)
 
 ## Roadmap
 
-- Migrate to CloutAtlas
 - Add interactive maps for POIs
 - Enable image uploads
 
