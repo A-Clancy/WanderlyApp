@@ -1,6 +1,6 @@
 {
-  "name": "playtime",
-  "version": "0.3.0",
+  "name": "Wanderly",
+  "version": "2.4.0",
   "description": "A POI based application for the HDip in Computing, WIT",
   "main": "src/server.js",
   "type": "module",
