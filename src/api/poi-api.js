@@ -105,7 +105,7 @@ export const poiApi = {
       }),
     },
     handler: async (request, h) => {
-      await db.poiStore.deletePOI(request.params.id);
+      await db.poiStore.deletePOIById(request.params.id); 
       return h.response().code(204);
     }
   },
