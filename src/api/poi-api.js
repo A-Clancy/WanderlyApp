@@ -40,10 +40,16 @@ export const poiApi = {
       payload: Joi.object({
         name: Joi.string().min(3).required(),
         description: Joi.string().optional(),
-        latitude: Joi.number().required(),
-        longitude: Joi.number().required(),
+        lat: Joi.number().required(),
+        lng: Joi.number().required(),
+        categoryId: Joi.string().required()
       }),
+      failAction: (request, h, err) => {
+        console.log("POI validation error:", err.message);
+        throw err;
+      }
     },
+
     handler: async (request, h) => {
       console.log("Handling POST /api/pois");
       console.log("Received payload:", request.payload);

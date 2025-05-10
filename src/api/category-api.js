@@ -38,26 +38,37 @@ export const categoryApi = {
     },
   },
 
-  create: {
-    auth: "jwt",
-    description: "Create a new category",
-    notes: "Adds a new category to the database.",
-    tags: ["api"],
-    validate: {
-      payload: Joi.object({
-        name: Joi.string().min(3).required(),
-      }),
-    },
-    handler: async function (request, h) {
-      try {
-        const category = request.payload;
-        const newCategory = await db.categoryStore.addCategory(category);
-        return newCategory ? h.response(newCategory).code(201) : Boom.badImplementation("Error creating category");
-      } catch (err) {
-        return Boom.serverUnavailable("Database Error", err);
+    create: {
+      auth: "jwt",
+      description: "Create a new category",
+      notes: "Adds a new category to the database.",
+      tags: ["api"],
+      validate: {
+        payload: Joi.object({
+          name: Joi.string().min(3).required(),
+        }),
+        failAction: (request, h, err) => {
+          console.log("Validation error:", err.message);
+          throw err;
+        }
+      },
+      handler: async function (request, h) {
+        try {
+          console.log("Received category payload:", request.payload);
+          const newCategory = await db.categoryStore.addCategory(request.payload);
+
+          if (newCategory) {
+            return h.response({ success: true, category: newCategory }).code(200);
+          } 
+            return Boom.badImplementation("Error creating category");
+        } catch (err) {
+          console.log("Database error:", err);
+          return Boom.serverUnavailable("Database Error");
+        }
       }
-    },
-  },
+    }
+    ,
+
 
   deleteOne: {
     auth: "jwt",
