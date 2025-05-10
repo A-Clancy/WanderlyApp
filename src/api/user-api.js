@@ -30,9 +30,9 @@ export const userApi = {
       try {
         console.log("Checking database connection...");
         console.log("Received login request for:", request.payload.email);
-  
+
         const user = await db.userStore.getUserByEmail(request.payload.email);
-        
+
         if (!user) {
           console.log("User not found");
           return Boom.unauthorized("User not found");
@@ -41,18 +41,17 @@ export const userApi = {
           console.log("Invalid password");
           return Boom.unauthorized("Invalid password");
         }
-  
+
         const token = createToken(user);
         console.log("Authentication successful, token generated.");
         return h.response({ success: true, token: token }).code(201);
-        
+
       } catch (err) {
         console.log("Database Error", err);
         return Boom.serverUnavailable("Database Error");
       }
     }
   },
- 
 
   findOne: {
     auth: "jwt",
@@ -77,17 +76,26 @@ export const userApi = {
     tags: ["api"],
     validate: {
       payload: Joi.object({
+        firstName: Joi.string().required(),
+        lastName: Joi.string().required(),
         email: Joi.string().email().required(),
         password: Joi.string().min(6).required(),
       }),
+      failAction: (request, h, err) => {
+        console.log("Joi validation error:", err.message);
+        throw err;
+      }
     },
     handler: async (request, h) => {
+      console.log("🧾 Payload received:", request.payload);
       const newUser = {
+        firstName: request.payload.firstName,
+        lastName: request.payload.lastName,
         email: request.payload.email,
         password: request.payload.password,
       };
       const user = await db.userStore.addUser(newUser);
-      return h.response(user).code(201);
+      return h.response({ success: true, user }).code(201);
     }
   },
 

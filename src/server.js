@@ -34,59 +34,83 @@ const swaggerOptions = {
 async function init() {
   const server = Hapi.server({
     port: process.env.PORT || 3000,
+    routes: {
+      cors: {
+        origin: ["*"],
+        headers: ["Authorization", "Content-Type"]
+      }
+    }
   });
 
-  await server.register([Cookie, jwt, Inert, Vision, { plugin: HapiSwagger, options: swaggerOptions }]);
+  await server.register([
+    Cookie,
+    jwt,
+    Inert,
+    Vision,
+    { plugin: HapiSwagger, options: swaggerOptions }
+  ]);
 
   server.validator(Joi);
 
   server.views({
-    engines: {
-      hbs: Handlebars,
-    },
+    engines: { hbs: Handlebars },
     relativeTo: __dirname,
     path: "./views",
     layoutPath: "./views/layouts",
     partialsPath: "./views/partials",
     layout: true,
-    isCached: false,
+    isCached: false
   });
 
   server.auth.strategy("session", "cookie", {
     cookie: {
       name: process.env.cookie_name,
       password: process.env.cookie_password,
-      isSecure: false,
+      isSecure: false
     },
     redirectTo: "/",
-    validate: accountsController.validate,
+    validate: accountsController.validate
   });
 
   server.auth.strategy("jwt", "jwt", {
     key: process.env.cookie_password,
-    validate: validate,
-    verifyOptions: { algorithms: ["HS256"] },
+    validate,
+    verifyOptions: { algorithms: ["HS256"] }
   });
 
   server.auth.default("session");
-  
+
   await db.init("mongo");
+
+  // CORS preflight handler (must come before other routes)
+  server.route({
+    method: "OPTIONS",
+    path: "/{any*}",
+    options: { auth: false },
+    handler: (request, h) => {
+      console.log("OPTIONS route hit");
+      return h
+        .response()
+        .code(204)
+        .header("Access-Control-Allow-Origin", "*")
+        .header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    }
+  });
 
   server.route(webRoutes);
   server.route(apiRoutes);
 
-  await server.start();
-  console.log("Server running on %s", server.info.uri);
-
+  // Static assets
   server.route({
     method: "GET",
     path: "/images/{param*}",
     handler: {
       directory: {
         path: "./public/images",
-        listing: false,
-      },
-    },
+        listing: false
+      }
+    }
   });
 
   server.route({
@@ -95,11 +119,13 @@ async function init() {
     handler: {
       directory: {
         path: "./public/styles",
-        listing: false,
-      },
-    },
+        listing: false
+      }
+    }
   });
 
+  await server.start();
+  console.log("Server running on %s", server.info.uri);
 }
 
 process.on("unhandledRejection", (err) => {
@@ -109,23 +135,43 @@ process.on("unhandledRejection", (err) => {
 
 init();
 
+// For unit tests
 export async function createServer() {
-  const server = Hapi.server({ port: 3000 });
+  const server = Hapi.server({
+    port: process.env.PORT || 3000,
+    routes: {
+      cors: {
+        origin: ["*"],
+        headers: ["Authorization", "Content-Type"]
+      }
+    }
+  });
 
   await db.init();
-
   await server.register(jwt);
 
   server.auth.strategy("jwt", "jwt", {
     key: process.env.cookie_password,
     validate,
-    verifyOptions: { algorithms: ["HS256"] },
+    verifyOptions: { algorithms: ["HS256"] }
   });
 
   server.auth.default("jwt");
+
+  // CORS preflight handler for tests too
+  server.route({
+    method: "OPTIONS",
+    path: "/{any*}",
+    options: { auth: false },
+    handler: (request, h) => h
+        .response()
+        .code(204)
+        .header("Access-Control-Allow-Origin", "*")
+        .header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+  });
 
   server.route(apiRoutes);
 
   return server;
 }
-
