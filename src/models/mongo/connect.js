@@ -1,9 +1,9 @@
 import * as dotenv from "dotenv";
 import Mongoose from "mongoose";
+import * as mongooseSeeder from "mais-mongoose-seeder";
+import { POI } from "./poi.js";
 import { User } from "./user.js";
 import { Category } from "./category.js";
-import { POI } from "./poi.js";
-import * as mongooseSeeder from "mais-mongoose-seeder";
 import { seedData } from "./seed-data.js";
 
 dotenv.config();

@@ -7,9 +7,9 @@ const poiSchema = new mongoose.Schema(
     latitude: Number,
     longitude: Number,
     categoryId: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
+    imageUrls: [String]
   },
-  { timestamps: true }  // adds `createdAt` and `updatedAt`
+  { timestamps: true }
 );
-
 
 export const POI = mongoose.model("POI", poiSchema);

@@ -1,6 +1,7 @@
 import Joi from "joi";
 import Boom from "@hapi/boom";
 import { db } from "../models/db.js";
+import { imageStore } from "../models/image-store.js";
 
 export const poiApi = {
   find: {
@@ -88,11 +89,9 @@ export const poiApi = {
       if (request.payload.longitude) poi.longitude = request.payload.longitude;
   
       await poi.save(); 
-  
       return h.response(poi).code(200); 
     },
   },
-  
 
   deleteOne: {
     auth: "jwt",
@@ -118,6 +117,42 @@ export const poiApi = {
     handler: async (request, h) => {
       await db.poiStore.deleteAllPOIs();
       return h.response().code(204);
+    }
+  },
+
+  uploadImages: {
+    auth: "jwt",
+    description: "Upload an image for a POI and store the Cloudinary URL",
+    tags: ["api"],
+    validate: {
+      params: Joi.object({
+        id: Joi.string().required()
+      }),
+    },
+    handler: async function (request, h) {
+      try {
+        const poi = await db.poiStore.getPOIById(request.params.id);
+        const file = request.payload.images;
+
+        if (file && Object.keys(file).length > 0) {
+          const url = await imageStore.uploadImage(file);
+          poi.imageUrls = poi.imageUrls || [];
+          poi.imageUrls.push(url);
+          await poi.save();
+          return h.response({ success: true, url }).code(200);
+        }
+
+        return h.response({ success: false, message: "No image uploaded" }).code(400);
+      } catch (err) {
+        console.log("Image upload error:", err);
+        return h.response({ success: false, message: "Error uploading image" }).code(500);
+      }
+    },
+    payload: {
+      multipart: true,
+      output: "data",
+      maxBytes: 2097152,
+      parse: true,
     }
   }
 };
