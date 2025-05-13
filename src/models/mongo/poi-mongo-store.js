@@ -24,6 +24,10 @@ export const poiMongoStore = {
     return this.getPOIById(poiObj._id);
   },
 
+    async updatePOI(id, updatedPOI) {
+    await POI.findByIdAndUpdate(id, updatedPOI, { new: true });
+  },
+
   async deletePOIById(id) {
     try {
       await POI.deleteOne({ _id: id });
