@@ -160,6 +160,47 @@ export const poiApi = {
     maxBytes: 2097152,
     parse: true,
   }
+}, 
+deleteImage: {
+  auth: "jwt",
+  description: "Delete a single image from a POI",
+  tags: ["api"],
+  validate: {
+    params: Joi.object({
+      id: Joi.string().required(),
+      index: Joi.number().min(0).required()
+    }),
+  },
+  handler: async function (request, h) {
+    const { id, index } = request.params;
+    const poi = await db.poiStore.getPOIById(id);
+
+    if (!poi) {
+      return Boom.notFound("POI not found");
+    }
+
+    if (!poi.imageUrls || index >= poi.imageUrls.length) {
+      return Boom.badRequest("Invalid image index");
+    }
+
+    const imageToDelete = poi.imageUrls[index];
+
+    try {
+      // Remove from Cloudinary
+      const publicId = imageToDelete.split("/").pop()?.split(".")[0];
+      await imageStore.deleteImage(publicId);
+
+      // Remove from POI
+      poi.imageUrls.splice(index, 1);
+      await db.poiStore.updatePOI(poi._id, poi);
+
+      return h.response({ success: true }).code(200);
+    } catch (err) {
+      console.log("Error deleting image:", err);
+      return h.response({ success: false, message: "Error deleting image" }).code(500);
+    }
+  }
 }
+
 
 };
