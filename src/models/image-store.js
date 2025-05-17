@@ -18,12 +18,15 @@ export const imageStore = {
     return result.resources;
   },
 
-  uploadImage: async function (imageBuffer) {
-    // Save the buffer to a temporary file
-    writeFileSync("./public/temp.img", imageBuffer);
-    const result = await cloudinary.v2.uploader.upload("./public/temp.img");
-    return result.url;
-  },
+uploadImage: async function (imagefile) {
+  const filename = `temp-${Date.now()}`; // unique name per upload
+  writeFileSync(`./public/${filename}`, imagefile);
+  const response = await cloudinary.v2.uploader.upload(`./public/${filename}`, {
+    unique_filename: true,
+    overwrite: false
+  });
+  return response.url;
+},
 
   deleteImage: async function (publicId) {
     await cloudinary.v2.uploader.destroy(publicId, {});

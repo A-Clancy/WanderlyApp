@@ -41,8 +41,8 @@ export const poiApi = {
       payload: Joi.object({
         name: Joi.string().min(3).required(),
         description: Joi.string().optional(),
-        lat: Joi.number().required(),
-        lng: Joi.number().required(),
+        latitude: Joi.number().required(),
+        longitude: Joi.number().required(),
         categoryId: Joi.string().required()
       }),
       failAction: (request, h, err) => {
@@ -120,9 +120,9 @@ export const poiApi = {
     }
   },
 
-  uploadImages: {
+uploadImages: {
   auth: "jwt",
-  description: "Upload an image for a POI and store the Cloudinary URL",
+  description: "Upload one or more images for a POI",
   tags: ["api"],
   validate: {
     params: Joi.object({
@@ -132,35 +132,42 @@ export const poiApi = {
   handler: async function (request, h) {
     try {
       const poi = await db.poiStore.getPOIById(request.params.id);
-      const file = request.payload.images;
+      const { images } = request.payload;
 
       if (!poi) {
         return Boom.notFound("POI not found");
       }
 
-      if (file && Object.keys(file).length > 0) {
-        const url = await imageStore.uploadImage(file);
-        const updatedPoi = {
-          ...poi,
-          imageUrls: [...(poi.imageUrls || []), url],
-        };
-        await db.poiStore.updatePOI(poi._id, updatedPoi);
-        return h.response({ success: true, url }).code(200);
-      }
+      const files = Array.isArray(images) ? images : [images];
+      console.log("Received image files:", files.map((f) => f.hapi?.filename || f.name));
 
-      return h.response({ success: false, message: "No image uploaded" }).code(400);
+      const uploadPromises = files.map((file) => {
+        if (file && Object.keys(file).length > 0) {
+          return imageStore.uploadImage(file);
+        }
+        return null;
+      });
+
+      const uploadedUrls = (await Promise.all(uploadPromises)).filter(Boolean);
+      console.log("Stored image URLs:", uploadedUrls);
+
+      poi.imageUrls = [...(poi.imageUrls || []), ...uploadedUrls];
+      await db.poiStore.updatePOI(poi._id, poi);
+
+      return h.response({ success: true, urls: uploadedUrls }).code(200);
     } catch (err) {
       console.log("Image upload error:", err);
-      return h.response({ success: false, message: "Error uploading image" }).code(500);
+      return h.response({ success: false, message: "Error uploading image(s)" }).code(500);
     }
   },
   payload: {
     multipart: true,
     output: "data",
-    maxBytes: 2097152,
+    maxBytes: 20971520,
     parse: true,
   }
-}, 
+},
+
 deleteImage: {
   auth: "jwt",
   description: "Delete a single image from a POI",
