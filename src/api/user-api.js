@@ -1,8 +1,9 @@
 import Joi from "joi";
 import Boom from "@hapi/boom";
+import bcrypt from "bcrypt"; // Hash check here, authentication level 2. 
 import { db } from "../models/db.js";
 import { createToken } from "./jwt-utils.js";
-import { UserSpec } from "../models/joi-schemas.js"; // Shared schema for user creation, authentication level 1. 
+import { UserSpec } from "../models/joi-schemas.js"; // Shared schema for user creation, authentication level 1.
 
 export const userApi = {
   find: {
@@ -40,7 +41,10 @@ export const userApi = {
           console.log("User not found");
           return Boom.unauthorized("User not found");
         }
-        if (user.password !== request.payload.password) {
+
+        const passwordsMatch = await bcrypt.compare(request.payload.password, user.password);
+
+        if (!passwordsMatch) {
           console.log("Invalid password");
           return Boom.unauthorized("Invalid password");
         }

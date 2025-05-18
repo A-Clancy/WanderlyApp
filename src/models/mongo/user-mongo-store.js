@@ -1,3 +1,4 @@
+import bcrypt from "bcrypt";
 import { User } from "./user.js";
 
 export const userMongoStore = {
@@ -16,7 +17,15 @@ export const userMongoStore = {
   async addUser(user) {
     try {
       console.log("ADD USER PAYLOAD:", user);
-      const newUser = new User(user);
+
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(user.password, saltRounds);
+
+      const newUser = new User({
+        ...user,
+        password: hashedPassword,
+      });
+
       await newUser.save();
       console.log("USER CREATED:", newUser);
       return newUser;
@@ -25,7 +34,6 @@ export const userMongoStore = {
       throw error;
     }
   },
-  
 
   async deleteUser(id) {
     await User.findByIdAndDelete(id);
