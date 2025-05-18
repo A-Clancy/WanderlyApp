@@ -10,7 +10,9 @@ export const poiApi = {
     notes: "Returns an array of all stored POIs.",
     tags: ["api"],
     handler: async (request, h) => {
-      const pois = await db.poiStore.getAllPOIs();
+      const userId = request.auth.credentials._id;
+      console.log("Authenticated user ID:", userId);
+      const pois = await db.poiStore.getPOIsByUserId(userId);
       return h.response(pois).code(200);
     }
   },
@@ -120,94 +122,92 @@ export const poiApi = {
     }
   },
 
-uploadImages: {
-  auth: "jwt",
-  description: "Upload one or more images for a POI",
-  tags: ["api"],
-  validate: {
-    params: Joi.object({
-      id: Joi.string().required()
-    }),
+  uploadImages: {
+    auth: "jwt",
+    description: "Upload one or more images for a POI",
+    tags: ["api"],
+    validate: {
+      params: Joi.object({
+        id: Joi.string().required()
+      }),
+    },
+    handler: async function (request, h) {
+      try {
+        const poi = await db.poiStore.getPOIById(request.params.id);
+        const { images } = request.payload;
+
+        if (!poi) {
+          return Boom.notFound("POI not found");
+        }
+
+        const files = Array.isArray(images) ? images : [images];
+        console.log("Received image files:", files.map((f) => f.hapi?.filename || f.name));
+
+        const uploadPromises = files.map((file) => {
+          if (file && Object.keys(file).length > 0) {
+            return imageStore.uploadImage(file);
+          }
+          return null;
+        });
+
+        const uploadedUrls = (await Promise.all(uploadPromises)).filter(Boolean);
+        console.log("Stored image URLs:", uploadedUrls);
+
+        poi.imageUrls = [...(poi.imageUrls || []), ...uploadedUrls];
+        await db.poiStore.updatePOI(poi._id, poi);
+
+        return h.response({ success: true, urls: uploadedUrls }).code(200);
+      } catch (err) {
+        console.log("Image upload error:", err);
+        return h.response({ success: false, message: "Error uploading image(s)" }).code(500);
+      }
+    },
+    payload: {
+      multipart: true,
+      output: "data",
+      maxBytes: 20971520,
+      parse: true,
+    }
   },
-  handler: async function (request, h) {
-    try {
-      const poi = await db.poiStore.getPOIById(request.params.id);
-      const { images } = request.payload;
+
+  deleteImage: {
+    auth: "jwt",
+    description: "Delete a single image from a POI",
+    tags: ["api"],
+    validate: {
+      params: Joi.object({
+        id: Joi.string().required(),
+        index: Joi.number().min(0).required()
+      }),
+    },
+    handler: async function (request, h) {
+      const { id, index } = request.params;
+      const poi = await db.poiStore.getPOIById(id);
 
       if (!poi) {
         return Boom.notFound("POI not found");
       }
 
-      const files = Array.isArray(images) ? images : [images];
-      console.log("Received image files:", files.map((f) => f.hapi?.filename || f.name));
+      if (!poi.imageUrls || index >= poi.imageUrls.length) {
+        return Boom.badRequest("Invalid image index");
+      }
 
-      const uploadPromises = files.map((file) => {
-        if (file && Object.keys(file).length > 0) {
-          return imageStore.uploadImage(file);
-        }
-        return null;
-      });
+      const imageToDelete = poi.imageUrls[index];
 
-      const uploadedUrls = (await Promise.all(uploadPromises)).filter(Boolean);
-      console.log("Stored image URLs:", uploadedUrls);
+      try {
+        // Remove from Cloudinary
+        const publicId = imageToDelete.split("/").pop()?.split(".")[0];
+        await imageStore.deleteImage(publicId);
 
-      poi.imageUrls = [...(poi.imageUrls || []), ...uploadedUrls];
-      await db.poiStore.updatePOI(poi._id, poi);
+        // Remove from POI
+        poi.imageUrls.splice(index, 1);
+        await db.poiStore.updatePOI(poi._id, poi);
 
-      return h.response({ success: true, urls: uploadedUrls }).code(200);
-    } catch (err) {
-      console.log("Image upload error:", err);
-      return h.response({ success: false, message: "Error uploading image(s)" }).code(500);
-    }
-  },
-  payload: {
-    multipart: true,
-    output: "data",
-    maxBytes: 20971520,
-    parse: true,
-  }
-},
-
-deleteImage: {
-  auth: "jwt",
-  description: "Delete a single image from a POI",
-  tags: ["api"],
-  validate: {
-    params: Joi.object({
-      id: Joi.string().required(),
-      index: Joi.number().min(0).required()
-    }),
-  },
-  handler: async function (request, h) {
-    const { id, index } = request.params;
-    const poi = await db.poiStore.getPOIById(id);
-
-    if (!poi) {
-      return Boom.notFound("POI not found");
-    }
-
-    if (!poi.imageUrls || index >= poi.imageUrls.length) {
-      return Boom.badRequest("Invalid image index");
-    }
-
-    const imageToDelete = poi.imageUrls[index];
-
-    try {
-      // Remove from Cloudinary
-      const publicId = imageToDelete.split("/").pop()?.split(".")[0];
-      await imageStore.deleteImage(publicId);
-
-      // Remove from POI
-      poi.imageUrls.splice(index, 1);
-      await db.poiStore.updatePOI(poi._id, poi);
-
-      return h.response({ success: true }).code(200);
-    } catch (err) {
-      console.log("Error deleting image:", err);
-      return h.response({ success: false, message: "Error deleting image" }).code(500);
+        return h.response({ success: true }).code(200);
+      } catch (err) {
+        console.log("Error deleting image:", err);
+        return h.response({ success: false, message: "Error deleting image" }).code(500);
+      }
     }
   }
-}
-
-
 };

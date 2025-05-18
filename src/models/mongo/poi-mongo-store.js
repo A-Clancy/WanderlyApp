@@ -17,6 +17,10 @@ export const poiMongoStore = {
     return POI.find({ categoryId: new mongoose.Types.ObjectId(categoryId) }).lean();
   },
 
+  async getPOIsByUserId(userId) {
+    return POI.find({ userId: userId }).lean();
+  },
+
   async addPOI(poi) {
     console.log("POI PAYLOAD RECEIVED:", poi);
     const newPOI = new POI(poi);
@@ -24,7 +28,7 @@ export const poiMongoStore = {
     return this.getPOIById(poiObj._id);
   },
 
-    async updatePOI(id, updatedPOI) {
+  async updatePOI(id, updatedPOI) {
     await POI.findByIdAndUpdate(id, updatedPOI, { new: true });
   },
 
