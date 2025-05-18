@@ -12,15 +12,17 @@ At the time, our team lacked the expertise to create a working model. The idea h
 
 ## Features
 
-- **User Authentication**: Sign up, log in, and manage your account.
+- **JWT Authentication**: Secure login using JSON Web Tokens.
+- **Password Hashing**: User passwords are stored using bcrypt hashing with salting (Authentication Level 2).
+- **Input Validation**: All user and POI input is validated and sanitised using Joi (Authentication Level 1).
 - **Category Management**: Create and delete user-defined categories.
 - **Point of Interest (POI) Management**: Add POIs to categories with descriptions and coordinates.
-- **Bulma-Based UI**: A clean and responsive interface using the Bulma CSS framework.
-- **MongoDB Integration**: All data is now stored persistently using MongoDB.
+- **Image Upload Support**: POIs can store multiple Cloudinary-hosted images (Images Level 3+).
+- **MongoDB Integration**: Persistent database storage using MongoDB Atlas or local MongoDB.
 - **Swagger Documentation**: Live API documentation available at `/documentation`.
 - **Admin Dashboard**: View system-wide analytics like user, category, and POI counts.
-- **Testing**: Includes model and API-level tests using Mocha and Chai. **Note: Some tests failed during the setup, specifically around category creation and database seeding.**
-- **Dev Mode Support**: Nodemon can be used for development.
+- **Testing**: Includes model and API-level tests using Mocha and Chai.
+- **Dev Mode Support**: Nodemon available for live-reload development workflow.
 
 ## Admin Access
 
@@ -44,36 +46,43 @@ Only a user with this email can access the admin dashboard.
    ```sh
    git clone https://github.com/YOUR-USERNAME/Wanderly.git
    cd Wanderly
+   ```
 
-2. **Install the dependencis**:
-npm install
+2. **Install the dependencies**:
+   ```sh
+   npm install
+   ```
 
-3. **Set up a .env file including the following alues**:
-PORT=3000
-COOKIE_NAME=sid
-COOKIE_PASSWORD=your_secure_cookie_password
-MONGO_URL=mongodb://localhost:27017/wanderly
+3. **Set up a `.env` file** including the following values:
+   ```env
+   PORT=3000
+   COOKIE_NAME=sid
+   COOKIE_PASSWORD=your_secure_cookie_password
+   MONGO_URL=mongodb://localhost:27017/wanderly
+   ```
 
-4. **Start the Application**:
-npm start
+4. **Start the application**:
+   ```sh
+   npm start
+   ```
    or
-npm run dev (development environment)
+   ```sh
+   npm run dev
+   ```
 
 ### Technologies
-- Backend: Node.js, Hapi.js
 
- - Frontend: Handlebars, Bulma
-
-- Database: MongoDB, CloudAtlas
-
-- Authentication: Cookie-based sessions
-
-- API Documentation: Swagger via hapi-swagger
+- **Backend**: Node.js, Hapi.js
+- **Frontend**: Handlebars (used for rendering admin dashboard and testing)
+- **Database**: MongoDB (local or Atlas)
+- **Authentication**: JWT (secure login), bcrypt (password hashing)
+- **API Documentation**: Swagger via hapi-swagger
 
 ## Roadmap
 
-- Add interactive maps for POIs
-- Enable image uploads
+- Ensure POIs are scoped to each user (currently all POIs are visible globally)
+- Improve Swagger examples for image handling
+- Optional: Add OAuth login support (Authentication Level 3+)
 
 ## Git Branching
 
@@ -85,11 +94,12 @@ To test additional features the following branches were created:
 | `feature/mongo-atlas`   | Migration from local MongoDB to MongoDB Atlas  |
 | `feature/glitch-deploy` | Deployment adjustments for Glitch hosting      |
 
-Each feature branch is merged back into `main` once tested and tagged. 
+Each feature branch is merged back into `main` once tested and tagged.
 
 ## Contribution
 
+Currently closed to contributions — this is an individual academic project.
 
+## License
 
-## Licence
-
+MIT
