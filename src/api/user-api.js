@@ -2,6 +2,7 @@ import Joi from "joi";
 import Boom from "@hapi/boom";
 import { db } from "../models/db.js";
 import { createToken } from "./jwt-utils.js";
+import { UserSpec } from "../models/joi-schemas.js"; // Shared schema for user creation, authentication level 1. 
 
 export const userApi = {
   find: {
@@ -25,12 +26,14 @@ export const userApi = {
         email: Joi.string().email().required(),
         password: Joi.string().min(6).required(),
       }),
+      failAction: (request, h, err) => {
+        console.log("Validation error during login:", err.message);
+        throw Boom.badRequest("Invalid email or password format");
+      }
     },
     handler: async function (request, h) {
       try {
-        console.log("Checking database connection...");
         console.log("Received login request for:", request.payload.email);
-
         const user = await db.userStore.getUserByEmail(request.payload.email);
 
         if (!user) {
@@ -43,9 +46,7 @@ export const userApi = {
         }
 
         const token = createToken(user);
-        console.log("Authentication successful, token generated.");
         return h.response({ success: true, token: token }).code(201);
-
       } catch (err) {
         console.log("Database Error", err);
         return Boom.serverUnavailable("Database Error");
@@ -75,26 +76,15 @@ export const userApi = {
     notes: "Creates a new user account.",
     tags: ["api"],
     validate: {
-      payload: Joi.object({
-        firstName: Joi.string().required(),
-        lastName: Joi.string().required(),
-        email: Joi.string().email().required(),
-        password: Joi.string().min(6).required(),
-      }),
+      payload: UserSpec,
       failAction: (request, h, err) => {
-        console.log("Joi validation error:", err.message);
-        throw err;
+        console.log("Validation error during signup:", err.message);
+        throw Boom.badRequest("Invalid user data");
       }
     },
     handler: async (request, h) => {
-      console.log("🧾 Payload received:", request.payload);
-      const newUser = {
-        firstName: request.payload.firstName,
-        lastName: request.payload.lastName,
-        email: request.payload.email,
-        password: request.payload.password,
-      };
-      const user = await db.userStore.addUser(newUser);
+      console.log("Payload received:", request.payload);
+      const user = await db.userStore.addUser(request.payload);
       return h.response({ success: true, user }).code(201);
     }
   },
