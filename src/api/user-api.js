@@ -1,9 +1,9 @@
 import Joi from "joi";
 import Boom from "@hapi/boom";
-import bcrypt from "bcrypt"; // Hash check here, authentication level 2. 
+import bcrypt from "bcrypt";
 import { db } from "../models/db.js";
 import { createToken } from "./jwt-utils.js";
-import { UserSpec } from "../models/joi-schemas.js"; // Shared schema for user creation, authentication level 1.
+import { UserSpec } from "../models/joi-schemas.js";
 
 export const userApi = {
   find: {
@@ -42,6 +42,8 @@ export const userApi = {
           return Boom.unauthorized("User not found");
         }
 
+        console.log("Loaded user from DB:", user);
+
         const passwordsMatch = await bcrypt.compare(request.payload.password, user.password);
 
         if (!passwordsMatch) {
@@ -50,7 +52,18 @@ export const userApi = {
         }
 
         const token = createToken(user);
-        return h.response({ success: true, token: token }).code(201);
+
+        const response = {
+          success: true,
+          token: token,
+          email: user.email,
+          name: `${user.firstName} ${user.lastName}`,
+          _id: user._id
+        };
+
+        console.log("Returning auth response:", response); // debug log in
+
+        return h.response(response).code(201);
       } catch (err) {
         console.log("Database Error", err);
         return Boom.serverUnavailable("Database Error");
