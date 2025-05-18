@@ -22,8 +22,9 @@ export async function connectMongo() {
     try {
       await Mongoose.connect(process.env.MONGO_URL || "mongodb://localhost:27017/wanderly");
       console.log("MongoDB Connected to:", Mongoose.connection.name);
-      await seed();
-    } catch (err) {
+      // await seed();
+      console.log("Seeding skipped for deployment.");
+      } catch (err) {
       console.error("MongoDB Connection Error:", err);
       process.exit(1);
     }
