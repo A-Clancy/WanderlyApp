@@ -25,8 +25,9 @@ export const db = {
 
       case "mongo":
         try {
-          const { connectMongo } = await import("./mongo/connect.js");
-          await connectMongo();
+          const connectModule = await import("./mongo/connect.js");
+          await connectModule.connectMongo();
+
 
           const { userMongoStore } = await import("./mongo/user-mongo-store.js");
           const { categoryMongoStore } = await import("./mongo/category-mongo-store.js");
