@@ -2,7 +2,7 @@ import Inert from "@hapi/inert";
 import Vision from "@hapi/vision";
 import Hapi from "@hapi/hapi";
 import Cookie from "@hapi/cookie";
-import dotenv from "dotenv";
+// dotenv removed for Render deployment
 import path from "path";
 import Joi from "joi";
 import HapiSwagger from "hapi-swagger";
@@ -17,12 +17,6 @@ import { validate } from "./api/jwt-utils.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-const result = dotenv.config();
-if (result.error) {
-  console.log(result.error.message);
-  process.exit(1);
-}
 
 const swaggerOptions = {
   info: {
@@ -64,8 +58,8 @@ async function init() {
 
   server.auth.strategy("session", "cookie", {
     cookie: {
-      name: process.env.cookie_name,
-      password: process.env.cookie_password,
+      name: "wanderly-session",
+      password: process.env.COOKIE_PASSWORD,
       isSecure: false
     },
     redirectTo: "/",
@@ -73,7 +67,7 @@ async function init() {
   });
 
   server.auth.strategy("jwt", "jwt", {
-    key: process.env.cookie_password,
+    key: process.env.COOKIE_PASSWORD,
     validate,
     verifyOptions: { algorithms: ["HS256"] }
   });
@@ -82,7 +76,7 @@ async function init() {
 
   await db.init("mongo");
 
-  // CORS preflight handler (must come before other routes)
+  // CORS preflight handler
   server.route({
     method: "OPTIONS",
     path: "/{any*}",
@@ -151,24 +145,23 @@ export async function createServer() {
   await server.register(jwt);
 
   server.auth.strategy("jwt", "jwt", {
-    key: process.env.cookie_password,
+    key: process.env.COOKIE_PASSWORD,
     validate,
     verifyOptions: { algorithms: ["HS256"] }
   });
 
   server.auth.default("jwt");
 
-  // CORS preflight handler for tests too
   server.route({
     method: "OPTIONS",
     path: "/{any*}",
     options: { auth: false },
     handler: (request, h) => h
-        .response()
-        .code(204)
-        .header("Access-Control-Allow-Origin", "*")
-        .header("Access-Control-Allow-Headers", "Content-Type, Authorization")
-        .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+      .response()
+      .code(204)
+      .header("Access-Control-Allow-Origin", "*")
+      .header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+      .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
   });
 
   server.route(apiRoutes);
