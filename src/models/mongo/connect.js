@@ -1,4 +1,4 @@
-import * as dotenv from "dotenv";
+// import * as dotenv from "dotenv";
 import Mongoose from "mongoose";
 import * as mongooseSeeder from "mais-mongoose-seeder";
 import { POI } from "./poi.js";
@@ -6,7 +6,7 @@ import { User } from "./user.js";
 import { Category } from "./category.js";
 import { seedData } from "./seed-data.js";
 
-dotenv.config();
+// dotenv.config();
 
 const seedLib = mongooseSeeder.default;
 
