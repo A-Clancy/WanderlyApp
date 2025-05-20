@@ -1,8 +1,7 @@
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
 import { db } from "../models/db.js";
 
-const result = dotenv.config();
+// dotenv removed for Render deployment
 
 export function createToken(user) {
   const payload = {
@@ -13,13 +12,13 @@ export function createToken(user) {
     algorithm: "HS256",
     expiresIn: "1h",
   };
-  return jwt.sign(payload, process.env.cookie_password, options);
+  return jwt.sign(payload, process.env.COOKIE_PASSWORD, options);
 }
 
 export function decodeToken(token) {
   const userInfo = {};
   try {
-    const decoded = jwt.verify(token, process.env.cookie_password);
+    const decoded = jwt.verify(token, process.env.COOKIE_PASSWORD);
     userInfo.userId = decoded.id;
     userInfo.email = decoded.email;
   } catch (e) {

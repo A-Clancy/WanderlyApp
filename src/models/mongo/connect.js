@@ -1,31 +1,33 @@
-// import * as dotenv from "dotenv";
-import Mongoose from "mongoose";
-import * as mongooseSeeder from "mais-mongoose-seeder";
-import { POI } from "./poi.js";
-import { User } from "./user.js";
-import { Category } from "./category.js";
-import { seedData } from "./seed-data.js";
+import * as cloudinary from "cloudinary";
+import { writeFileSync } from "fs";
 
-// dotenv.config();
+// dotenv removed for Render deployment
 
-const seedLib = mongooseSeeder.default;
+const credentials = {
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET
+};
 
-async function seed() {
-  const seeder = seedLib(Mongoose);
-  const dbData = await seeder.seed(seedData, { dropDatabase: false, dropCollections: true });
-  console.log("Database seeded with:", dbData);
-}
+cloudinary.config(credentials);
 
-export async function connectMongo() {
-    Mongoose.set("strictQuery", true);
-  
-    try {
-      await Mongoose.connect(process.env.MONGO_URL || "mongodb://localhost:27017/wanderly");
-      console.log("MongoDB Connected to:", Mongoose.connection.name);
-      // await seed();
-      console.log("Seeding skipped for deployment.");
-      } catch (err) {
-      console.error("MongoDB Connection Error:", err);
-      process.exit(1);
-    }
-}
+export const imageStore = {
+  getAllImages: async function () {
+    const result = await cloudinary.v2.api.resources();
+    return result.resources;
+  },
+
+  uploadImage: async function (imagefile) {
+    const filename = `temp-${Date.now()}`; // unique name per upload
+    writeFileSync(`./public/${filename}`, imagefile);
+    const response = await cloudinary.v2.uploader.upload(`./public/${filename}`, {
+      unique_filename: true,
+      overwrite: false
+    });
+    return response.url;
+  },
+
+  deleteImage: async function (publicId) {
+    await cloudinary.v2.uploader.destroy(publicId, {});
+  }
+};
